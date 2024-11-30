@@ -1,101 +1,83 @@
-import Image from "next/image";
+"use client";
+import React, { useState } from "react";
+import AddItem from "../components/AddItem";
+import TodoCard from "../components/TodoCard";
+import { CirclePlus } from "lucide-react";
 
-export default function Home() {
+const App = () => {
+  const [todos, setTodos] = useState([]);
+  const [filter, setFilter] = useState("All"); // Default filter
+  const [openTodo, setOpenTodo] = useState(false);
+
+  const newTodo = {
+    id: Date.now(), // Use timestamp as unique ID
+    text: "Sample Task",
+    label: "Work",
+    isCompleted: false,
+    createdAt: new Date().toLocaleString(),
+  };
+  
+  // Add new todo
+  const addTodo = (newTodo) => {
+    setTodos([
+      ...todos,
+      { ...newTodo, id: Date.now() }, // Assign unique ID
+    ]);
+  };
+  
+
+  // Filtered todos based on category
+  const filteredTodos =
+    filter === "All" ? todos : todos.filter((todo) => todo.label === filter);
+
+  // Close Add Todo Modal
+  const close = () => {
+    setOpenTodo(false);
+  };
+
+  // Open Add Todo Modal
+  const openTodoAdd = () => {
+    setOpenTodo(true);
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="max-w-[400px] w-full mx-auto px-4 flex flex-col gap-5">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-black text-4xl font-black">Your Notes</h1>
+        <div onClick={openTodoAdd}>
+          <CirclePlus className="text-black" />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+
+      {/* Add Item Modal */}
+      {openTodo && <AddItem onAddTodo={addTodo} close={close} />}
+
+      {/* Tabs for Categories */}
+      <div className="tabs flex gap-2 overflow-hidden overflow-x-scroll scroll-smooth scrollbar-hide">
+        {["All", "Personal", "Work", "Fitness", "Other"].map((category) => (
+          <div
+            key={category}
+            className={`tab cursor-pointer transition-all ease-in-out duration-300 ${
+              filter === category
+                ? "bg-green-500 border-[1px] border-green-500 rounded-lg px-4"
+                : "bg-transparent border-[1px] border-white rounded-lg px-4"
+            }`}
+            onClick={() => setFilter(category)}
+          >
+            {category}
+          </div>
+        ))}
+      </div>
+
+      {/* Todo Cards */}
+      {filteredTodos.length === 0 ? (
+        <h1 className="text-black">No Notes Found</h1>
+      ) : (
+        <TodoCard todos={filteredTodos} setTodos={setTodos} />
+      )}
     </div>
   );
-}
+};
+
+export default App;
